@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PRODUCTS 100
+typedef struct {
+    char name[100];
+    float price;
+    float rating;
+} Product;
+void writeToCSV(Product products[], int count, const char *filename) {
+    FILE *fp = fopen(filename, "w");
+
+    if (fp == NULL) {
+        perror("Unable to open file");
+        exit(1);
+    }
+
+    fprintf(fp, "Name,Price,Rating\n");
+   for (int i = 0; i < count; i++) {
+        fprintf(fp, "\"%s\",%.2f,%.1f\n", products[i].name, products[i].price, products[i].rating);
+    }
+
+    fclose(fp);
+    printf("Product data written to '%s'\n", filename);
+}
+int main() {
+    Product products[MAX_PRODUCTS];
+    int n;
+
+    printf("Enter number of products to store (max %d): ", MAX_PRODUCTS);
+    scanf("%d", &n);
+    getchar();
+
+    if (n > MAX_PRODUCTS || n <= 0) {
+        printf("Invalid product count!\n");
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        printf("\nEnter details for product %d\n", i + 1);
+
+        printf("Name: ");
+        fgets(products[i].name, sizeof(products[i].name), stdin);
+        products[i].name[strcspn(products[i].name, "\n")] = '\0'; 
+
+        printf("Price: ");
+        scanf("%f", &products[i].price);
+
+        printf("Rating (0.0 to 5.0): ");
+        scanf("%f", &products[i].rating);
+        getchar(); 
+    }
+
+    writeToCSV(products, n, "products.csv");
+
+    return 0;
+}
